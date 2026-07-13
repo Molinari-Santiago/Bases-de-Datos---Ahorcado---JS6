@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Ahorcado - Estanga</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <h1>El Ahorcado</h1>
+    </div>
+    <div class="header-actions">
+      <span id="fechaActual" class="date-pill">--/--/----</span>
+      <button id="btnTema" class="icon-button" type="button" aria-label="Cambiar modo">Dia</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="panel player-panel">
+      <div class="panel-title">
+        <h2>Jugador</h2>
+        <span class="status-dot"></span>
+      </div>
+
+      <label class="field">
+        <span>Nombre</span>
+        <input id="nombreJugador" type="text" maxlength="40" placeholder="Tu nombre">
+      </label>
+
+      <div class="button-grid">
+        <button id="btnIniciar" type="button" class="primary-button">Iniciar juego</button>
+        <button id="btnGuardar" type="button" class="secondary-button" disabled>Guardar score</button>
+      </div>
+
+      <div class="stats-grid">
+        <article>
+          <span>Intentos</span>
+          <strong id="intentos">6</strong>
+        </article>
+        <article>
+          <span>Puntos</span>
+          <strong id="puntos">0</strong>
+        </article>
+        <article>
+          <span>Tiempo</span>
+          <strong id="tiempo">0s</strong>
+        </article>
+      </div>
+
+      <div id="mensaje" class="message-box is-info">Ingresa tu nombre para empezar.</div>
+    </section>
+
+    <section class="panel game-panel">
+      <div class="game-top">
+        <div>
+          <h2>Partida</h2>
+          <p id="estadoPartida" class="muted">Esperando jugador</p>
+        </div>
+        <div class="tries-chip">
+          <span>Fallos</span>
+          <strong id="fallos">0</strong>
+        </div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="canvasAhorcado" width="520" height="320" aria-label="Dibujo del ahorcado"></canvas>
+      </div>
+
+      <div id="palabraOculta" class="hidden-word">_ _ _ _ _ _ _</div>
+
+      <div id="pistaBox" class="hint-box">
+        <span>Pista</span>
+        <strong id="pista">Sin pista</strong>
+      </div>
+
+      <div class="letter-row">
+        <label class="field letter-field">
+          <span>Letra</span>
+          <input id="letraInput" type="text" maxlength="1" placeholder="A" disabled>
+        </label>
+        <button id="btnProbar" type="button" class="primary-button" disabled>Probar letra</button>
+      </div>
+
+      <div class="wrong-box">
+        <span>Letras incorrectas</span>
+        <strong id="letrasIncorrectas">Ninguna</strong>
+      </div>
+    </section>
+
+    <section class="panel score-panel">
+      <div class="score-heading">
+        <div>
+          <p class="score-kicker">Ranking</p>
+          <h2>Tabla de posiciones</h2>
+          <p class="score-subtitle">Busca jugadores, ordena resultados y exporta la partida.</p>
+        </div>
+        <span class="small-label score-badge">Top 50</span>
+      </div>
+
+      <div class="score-controls">
+        <label class="field">
+          <span>Buscar</span>
+          <input id="busquedaScore" type="search" maxlength="80" placeholder="Nombre del jugador">
+        </label>
+
+        <label class="field">
+          <span>Ordenar por</span>
+          <select id="ordenarScore">
+            <option value="puntos">Puntos</option>
+            <option value="nombre">Nombre</option>
+            <option value="tiempo">Tiempo</option>
+            <option value="fecha">Fecha</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Direccion</span>
+          <select id="direccionScore">
+            <option value="DESC">Descendente</option>
+            <option value="ASC">Ascendente</option>
+          </select>
+        </label>
+
+        <div class="score-actions">
+          <button id="btnActualizar" type="button" class="secondary-button">Actualizar tabla</button>
+          <button id="btnPdf" type="button" class="download-button pdf-button">Descargar PDF</button>
+          <button id="btnExcel" type="button" class="download-button excel-button">Descargar Excel</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Puntos</th>
+              <th>Tiempo</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="tablaScores">
+            <tr>
+              <td class="empty-table" colspan="5">Sin datos cargados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/Ahorcado.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
