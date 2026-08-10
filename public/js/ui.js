@@ -128,7 +128,7 @@ const UI = (() => {
       elementos.tiempo.textContent = "0s";
       elementos.fallos.textContent = "0";
       elementos.palabraOculta.textContent = "_ _ _ _ _ _ _";
-      elementos.pista.textContent = "Sin pista";
+      elementos.pista.textContent = "Necesitas una ayuda?";
       elementos.letrasIncorrectas.textContent = "Ninguna";
       elementos.estadoPartida.textContent = "Esperando jugador";
       dibujarAhorcado(0);
@@ -140,7 +140,6 @@ const UI = (() => {
     elementos.tiempo.textContent = `${juego.obtenerTiempo()}s`;
     elementos.fallos.textContent = juego.letrasIncorrectas.length;
     elementos.palabraOculta.textContent = juego.obtenerPalabraOculta();
-    elementos.pista.textContent = juego.pista;
     elementos.letrasIncorrectas.textContent = juego.letrasIncorrectas.length
       ? juego.letrasIncorrectas.map((letra) => letra.toUpperCase()).join(", ")
       : "Ninguna";

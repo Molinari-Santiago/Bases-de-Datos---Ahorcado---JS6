@@ -1,29 +1,67 @@
-const palabras = [
-  { palabra: "javascript", pista: "Lenguaje usado en el navegador." },
-  { palabra: "express", pista: "Framework de servidor para Node.js." },
-  { palabra: "mysql", pista: "Motor de base de datos usado con XAMPP." },
-  { palabra: "variable", pista: "Espacio donde se guarda un dato." },
-  { palabra: "funcion", pista: "Bloque reutilizable de codigo." },
-  { palabra: "controlador", pista: "Parte que recibe y responde pedidos." },
-  { palabra: "servidor", pista: "Programa que atiende peticiones." },
-  { palabra: "frontend", pista: "Parte visual que usa el jugador." },
-  { palabra: "backend", pista: "Parte que procesa datos del servidor." },
-  { palabra: "ahorcado", pista: "Juego de adivinar letras." },
-  { palabra: "responsive", pista: "Diseno que se adapta a pantallas." }
-];
+const palabraService = require("../services/palabraService");
 
-// Devuelve una palabra aleatoria para una partida.
-function pedirPalabra(req, res) {
-  const indice = Math.floor(Math.random() * palabras.length);
-  const seleccion = palabras[indice];
+// Pide una palabra aleatoria al servicio.
+async function pedirPalabra(req, res) {
+  try {
+    const palabra = await palabraService.obtenerPalabraAleatoria();
 
-  res.json({
-    ok: true,
-    palabra: seleccion.palabra,
-    pista: seleccion.pista
-  });
+    if (!palabra) {
+      return res.status(503).json({
+        ok: false,
+        mensaje: "No se pudo obtener una palabra en este momento."
+      });
+    }
+
+    res.json({
+      ok: true,
+      palabra
+    });
+  } catch (error) {
+    console.log("Error en palabraController:", error.message);
+
+    res.status(500).json({
+      ok: false,
+      mensaje: "No se pudo obtener una palabra en este momento."
+    });
+  }
+}
+
+// Pide una pista para la palabra actual.
+async function pedirPista(req, res) {
+  try {
+    const palabra = String(req.body.palabra || "").trim();
+
+    if (!palabraService.esPalabraValida(palabra)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: "La palabra no es valida para pedir una pista."
+      });
+    }
+
+    const pista = await palabraService.obtenerPista(palabra);
+
+    if (!pista) {
+      return res.json({
+        ok: false,
+        mensaje: "No hay una pista disponible para esta palabra."
+      });
+    }
+
+    res.json({
+      ok: true,
+      pista
+    });
+  } catch (error) {
+    console.log("Error al obtener pista:", error.message);
+
+    res.status(500).json({
+      ok: false,
+      mensaje: "No hay una pista disponible para esta palabra."
+    });
+  }
 }
 
 module.exports = {
-  pedirPalabra
+  pedirPalabra,
+  pedirPista
 };

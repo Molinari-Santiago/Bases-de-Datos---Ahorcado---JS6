@@ -11,9 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnPdf = document.querySelector("#btnPdf");
   const btnExcel = document.querySelector("#btnExcel");
   const btnTema = document.querySelector("#btnTema");
+  const btnPista = document.querySelector("#btnPista");
+  const pistaTexto = document.querySelector("#pista");
   const pistaBox = document.querySelector("#pistaBox");
 
   let juego = null;
+  let palabraActual = "";
   let reloj = null;
   let scoreGuardado = false;
   let temporizadorBusqueda = null;
@@ -22,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   UI.mostrarFechaActual();
   UI.renderizarJuego(null);
   aplicarTemaGuardado();
+  reiniciarPista(false);
   listarScores();
 
   btnIniciar.addEventListener("click", iniciarJuego);
@@ -31,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   btnPdf.addEventListener("click", descargarPdf);
   btnExcel.addEventListener("click", descargarExcel);
   btnTema.addEventListener("click", alternarTema);
+  btnPista.addEventListener("click", pedirPista);
   pistaBox.addEventListener("dblclick", UI.alternarPista);
   ordenarScore.addEventListener("change", listarScores);
   direccionScore.addEventListener("change", listarScores);
@@ -73,6 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+  // Reinicia el bloque visual de pista.
+  function reiniciarPista(habilitada) {
+    pistaTexto.textContent = "Necesitas una ayuda?";
+    btnPista.textContent = "Mostrar pista";
+    btnPista.disabled = !habilitada;
+    pistaBox.classList.remove("is-hidden");
+  }
+
   // Inicia una partida nueva.
   async function iniciarJuego() {
     const nombre = nombreInput.value.trim();
@@ -85,7 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const datos = await apiPost("/api/palabra");
-      juego = new Ahorcado(datos.palabra, datos.pista, nombre);
+
+      if (!datos.ok) {
+        throw new Error(datos.mensaje || "No se pudo obtener una palabra en este momento.");
+      }
+
+      palabraActual = datos.palabra;
+      juego = new Ahorcado(datos.palabra, nombre);
       scoreGuardado = false;
 
       letraInput.disabled = false;
@@ -93,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btnGuardar.disabled = true;
       letraInput.value = "";
       letraInput.focus();
+      reiniciarPista(true);
 
       detenerReloj();
       reloj = setInterval(() => UI.renderizarJuego(juego), 1000);
@@ -100,6 +120,36 @@ document.addEventListener("DOMContentLoaded", () => {
       UI.renderizarJuego(juego);
       UI.mostrarMensaje("Partida iniciada. Buena suerte.", "success");
     } catch (error) {
+      UI.mostrarMensaje(error.message, "error");
+    }
+  }
+
+  // Solicita una pista al backend.
+  async function pedirPista() {
+    if (!juego || juego.finalizado || juego.pistaUsada) {
+      return;
+    }
+
+    try {
+      btnPista.disabled = true;
+      btnPista.textContent = "Buscando pista...";
+      const respuesta = await apiPost("/api/palabra/pista", { palabra: palabraActual || juego.palabra });
+
+      if (!respuesta.ok || !respuesta.pista) {
+        juego.pistaUsada = true;
+        pistaTexto.textContent = respuesta.mensaje || "No hay una pista disponible para esta palabra.";
+        btnPista.textContent = "Sin pista";
+        UI.mostrarMensaje(pistaTexto.textContent, "info");
+        return;
+      }
+
+      juego.pistaUsada = true;
+      pistaTexto.textContent = respuesta.pista;
+      btnPista.textContent = "Pista mostrada";
+      UI.mostrarMensaje("Pista cargada correctamente.", "success");
+    } catch (error) {
+      btnPista.disabled = false;
+      btnPista.textContent = "Mostrar pista";
       UI.mostrarMensaje(error.message, "error");
     }
   }
@@ -134,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     detenerReloj();
     letraInput.disabled = true;
     btnProbar.disabled = true;
+    btnPista.disabled = true;
     btnGuardar.disabled = false;
 
     if (juego.gano) {

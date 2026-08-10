@@ -1,9 +1,8 @@
 class Ahorcado {
   // Crea una partida nueva.
-  constructor(palabra, pista, nombre) {
+  constructor(palabra, nombre) {
     this.palabras = [this.normalizarTexto(palabra)];
     this.palabra = this.palabras[0];
-    this.pista = pista;
     this.nombre = nombre;
     this.letrasCorrectas = [];
     this.letrasIncorrectas = [];
@@ -12,15 +11,18 @@ class Ahorcado {
     this.finalizado = false;
     this.gano = false;
     this.puntos = 0;
+    this.pistaUsada = false;
   }
 
   // Limpia el texto para comparar letras.
   normalizarTexto(texto) {
     return String(texto)
       .toLowerCase()
+      .replace(/\u00f1/g, "__enie__")
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zñ]/g, "");
+      .replace(/__enie__/g, "\u00f1")
+      .replace(/[^a-z\u00f1]/g, "");
   }
 
   // Prueba una letra en la palabra actual.

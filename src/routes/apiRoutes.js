@@ -5,6 +5,7 @@ const palabraController = require("../controllers/palabraControllers");
 const scoreController = require("../controllers/scoreControllers");
 
 router.post("/palabra", palabraController.pedirPalabra);
+router.post("/palabra/pista", palabraController.pedirPista);
 router.post("/score/guardar", scoreController.guardarScore);
 router.post("/score/listar", scoreController.listarScores);
 router.post("/score/pdf", scoreController.descargarPdf);
